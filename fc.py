@@ -14,17 +14,25 @@ import argparse
 def init_parser():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("folder", help="Folder(s) with files to compare", nargs='+')
+    parser.add_argument("folder", nargs='+',
+                        help="Folder(s) with files to compare")
+    parser.add_argument("--ext", nargs='*',
+                        help="Extensions to include")
 
     return parser
 
 
-def find_files(folder):
+def find_files(folder, extensions=None):
     found_files = []
     for root, dirs, files in os.walk(folder):
         for filename in files:
-            found_files.append(os.path.join(root, filename))
-
+            fullname = os.path.join(root, filename)
+            if extensions is None:
+                found_files.append(fullname)
+            else:
+                ext = os.path.splitext(fullname)
+                if ext in extensions:
+                    found_files.append(fullname)
     return found_files
 
 
@@ -67,10 +75,9 @@ def main():
     args = parser.parse_args()
 
     files = []
-    print(args.folder)
     for folder in args.folder:
         print(" * Finding files in folder: ", folder)
-        files += find_files(folder)
+        files += find_files(folder, args.ext if len(args.ext) > 0 else None)
 
     print("* Finding file sizes for %d files " % (len(files)))
     sizes = find_sizes(files)
