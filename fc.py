@@ -30,8 +30,8 @@ def find_files(folder, extensions=None):
             if extensions is None:
                 found_files.append(fullname)
             else:
-                ext = os.path.splitext(fullname)
-                if ext in extensions:
+                ext = os.path.splitext(fullname)[1][1:]
+                if ext.lower() in extensions:
                     found_files.append(fullname)
     return found_files
 
@@ -77,7 +77,7 @@ def main():
     files = []
     for folder in args.folder:
         print(" * Finding files in folder: ", folder)
-        files += find_files(folder, args.ext if len(args.ext) > 0 else None)
+        files += find_files(folder, args.ext)
 
     print("* Finding file sizes for %d files " % (len(files)))
     sizes = find_sizes(files)
